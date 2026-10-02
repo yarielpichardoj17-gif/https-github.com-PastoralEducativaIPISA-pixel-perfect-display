@@ -998,3 +998,174 @@ function closeTeacherLogin(){
 }
 
 function teacherLogin(){
+  const user=$('teacherUser').value.trim().toLowerCase();
+  const pin=$('teacherPin').value.trim();
+
+  if(!user || !pin){
+    setFb('teacherLoginFeedback','warn','Escribe el usuario y el PIN docente.');
+    return;
+  }
+
+  if(user===TEACHER_USERNAME && pin===TEACHER_PIN){
+    try{
+      sessionStorage.setItem(TEACHER_SESSION_KEY,'1');
+    }catch(e){}
+    closeTeacherLogin();
+    renderRecords();
+    $('recordsModal').classList.add('show');
+  }else{
+    setFb('teacherLoginFeedback','err','Usuario o PIN incorrecto.');
+    $('teacherPin').value='';
+    $('teacherPin').focus();
+  }
+}
+
+function teacherLogout(){
+  try{
+    sessionStorage.removeItem(TEACHER_SESSION_KEY);
+  }catch(e){}
+  closeRecords();
+}
+
+function teacherGuard(){
+  if(!isTeacherAuthorized()){
+    requestTeacherAccess();
+    return false;
+  }
+  return true;
+}
+
+const SUPABASE_URL='https://bahilwtorkiipmwvbtpe.supabase.co';
+const SUPABASE_KEY='sb_publishable_-qOAG7jcbBfoRoxFO2ZkjQ_eWJzjps_';
+const RECORDS_KEY='geoescape_ipisa_results_v1';
+function getRecords(){
+  try{const raw=localStorage.getItem(RECORDS_KEY);return raw?JSON.parse(raw):[];}catch(e){return [];}
+}
+function setRecords(records){
+  try{localStorage.setItem(RECORDS_KEY,JSON.stringify(records));return true;}catch(e){alert('No fue posible guardar el resultado en este navegador.');return false;}
+}
+function saveCurrentResult(){
+  if(st.resultSaved) return;
+  const student=$('studentName').value.trim();
+  const course=$('studentCourse').value.trim();
+  if(!student || !course) return;
+  const finalTotal=Math.min(100,total()+5);
+  const payload={
+    student_name:student,
+    course_section:course,
+    team_code:$('teamCode').value.trim()||null,
+    destination:place(st.destination).name,
+    locate_score:st.score.locate,
+    think_score:st.score.think,
+    escape_score:st.score.escape,
+    create_score:st.score.create,
+    participation_score:5,
+    total_score:finalTotal,
+    route_json:{route:st.route.map(id=>place(id).name)},
+    explanation:$('explanation').value.trim()
+  };
+  fetch(SUPABASE_URL+'/rest/v1/results',{
+    method:'POST',
+    headers:{
+      'apikey':SUPABASE_KEY,
+      'Authorization':'Bearer '+SUPABASE_KEY,
+      'Content-Type':'application/json',
+      'Prefer':'return=minimal'
+    },
+    body:JSON.stringify(payload)
+  }).then(r=>{
+    if(!r.ok) return r.text().then(t=>{throw new Error(t||('HTTP '+r.status));});
+    st.resultSaved=true;
+  }).catch(err=>{
+    console.error('No se pudo guardar el resultado centralmente:',err);
+  });
+}
+function openRecords(){if(!teacherGuard())return;renderRecords();$('recordsModal').classList.add('show');}
+function closeRecords(){$('recordsModal').classList.remove('show');}
+function renderRecords(){if(!teacherGuard())return;
+  const records=getRecords().slice().sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  $('recordCount').textContent=records.length;
+  $('recordAverage').textContent=records.length?Math.round(records.reduce((s,r)=>s+(Number(r.total)||0),0)/records.length):0;
+  $('recordBest').textContent=records.length?Math.max(...records.map(r=>Number(r.total)||0)):0;
+  $('recordsEmpty').style.display=records.length?'none':'block';
+  $('recordsBody').innerHTML=records.map(r=>`<tr><td>${esc(r.dateLabel||new Date(r.timestamp).toLocaleString('es-DO'))}</td><td><strong>${esc(r.student||'')}</strong></td><td>${esc(r.course||'')}</td><td>${esc(r.team||'—')}</td><td>${esc(r.destination||'')}</td><td>${Number(r.locate)||0}/30</td><td>${Number(r.think)||0}/25</td><td>${Number(r.escape)||0}/20</td><td>${Number(r.create)||0}/20</td><td><strong>${Number(r.total)||0}/100</strong></td></tr>`).join('');
+}
+function csvCell(v){const s=String(v??'');return '"'+s.replace(/"/g,'""')+'"';}
+function exportRecordsCSV(){if(!teacherGuard())return;
+  const records=getRecords();if(!records.length){alert('No hay resultados para exportar.');return;}
+  const headers=['Fecha y hora','Estudiante','Curso / sección','Equipo','Destino','Ubicación','Orientación','Escape room','Representación','Total','Ruta','Explicación'];
+  const rows=records.map(r=>[r.dateLabel||r.timestamp,r.student,r.course,r.team||'',r.destination,r.locate,r.think,r.escape,r.create,r.total,Array.isArray(r.route)?r.route.join(' → '):'',r.explanation||'']);
+  const csv='\uFEFF'+[headers,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='resultados-geoescape-ipisa.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function exportRecordsJSON(){if(!teacherGuard())return;
+  const records=getRecords();if(!records.length){alert('No hay resultados para exportar.');return;}
+  const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='respaldo-resultados-geoescape-ipisa.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+function importRecordsJSON(){if(!teacherGuard())return;$('recordsImportFile').value='';$('recordsImportFile').click();}
+function handleRecordsImport(event){if(!teacherGuard())return;
+  const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();
+  reader.onload=()=>{try{const incoming=JSON.parse(reader.result);if(!Array.isArray(incoming))throw new Error();const current=getRecords(),ids=new Set(current.map(r=>r.id));incoming.forEach(r=>{if(r&&typeof r==='object'){if(!r.id)r.id='import_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);if(!ids.has(r.id)){current.push(r);ids.add(r.id);}}});setRecords(current);renderRecords();alert('Copia importada correctamente.');}catch(e){alert('No se pudo importar el archivo. Verifica que sea una copia JSON válida.');}};
+  reader.readAsText(file,'utf-8');
+}
+function clearRecords(){if(!teacherGuard())return;
+  const records=getRecords();if(!records.length){alert('El historial ya está vacío.');return;}
+  if(!confirm('¿Seguro que deseas borrar todos los resultados guardados en este navegador? Esta acción no se puede deshacer.'))return;
+  localStorage.removeItem(RECORDS_KEY);renderRecords();
+}
+function setFb(id,type,msg){ const el=$(id); el.className='feedback show '+(type==='ok'?'ok':type==='warn'?'warn':'err'); el.innerHTML=msg; }
+function openTeacher(){ $('teacherModal').classList.add('show'); }
+function closeTeacher(){ $('teacherModal').classList.remove('show'); }
+$('teacherModal').addEventListener('click',e=>{if(e.target.id==='teacherModal') closeTeacher();});
+$('recordsModal').addEventListener('click',e=>{if(e.target.id==='recordsModal') closeRecords();});
+$('teacherLoginModal').addEventListener('click',e=>{if(e.target.id==='teacherLoginModal') closeTeacherLogin();});
+$('teacherPin').addEventListener('keydown',e=>{if(e.key==='Enter') teacherLogin();});
+function downloadEvidence(){
+  const canvas=document.createElement('canvas'); canvas.width=1600; canvas.height=1450;
+  const ctx=canvas.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  const img=new Image();
+  img.onload=()=>{
+    ctx.fillStyle='#234b68'; ctx.font='bold 34px Arial'; ctx.textAlign='center';
+    ctx.fillText($('workTitle').value.trim(), 800, 46);
+    ctx.font='18px Arial'; ctx.fillStyle='#5d6b78';
+    ctx.fillText($('studentName').value.trim()+' · '+$('studentCourse').value.trim(),800,72);
+    ctx.font='16px Arial'; ctx.fillStyle='#6a7785';
+    ctx.fillText(($('teamCode').value.trim()||'Trabajo individual')+' · '+new Date().toLocaleDateString('es-DO'),800,96);
+    const x=80,y=120,w=1440,h=1140; ctx.drawImage(img,x,y,w,h);
+    if(st.route.length>1){
+      ctx.strokeStyle='#f39a25'; ctx.lineWidth=8; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+      st.route.forEach((id,idx)=>{ const p=place(id), px=x+(p.x/100)*w, py=y+(p.y/100)*h; if(idx===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+      ctx.stroke();
+      st.route.forEach(id=>{
+        const p=place(id), px=x+(p.x/100)*w, py=y+(p.y/100)*h;
+        ctx.fillStyle='#fff'; ctx.strokeStyle='#b66914'; ctx.lineWidth=3;
+        ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='#14374f'; ctx.font='bold 16px Arial'; ctx.textAlign='left';
+        ctx.fillText(p.name, px+12, py-10);
+      });
+    }
+    ctx.fillStyle='#234b68'; ctx.font='bold 21px Arial'; ctx.textAlign='left'; ctx.fillText('Leyenda',80,1305);
+    ctx.font='18px Arial'; ctx.fillStyle='#213446';
+    let lx=80, ly=1335;
+    ESSENTIAL.filter(id=>st.symbolMap[id]).forEach(id=>{
+      const txt=st.symbolMap[id]+' '+place(id).name;
+      ctx.fillText(txt,lx,ly); lx+=ctx.measureText(txt).width+28; if(lx>1320){lx=80;ly+=28;}
+    });
+    ctx.fillStyle='#234b68'; ctx.font='bold 20px Arial'; ctx.fillText('Puntaje final: '+Math.min(100,total()+5)+'/100',80,1410);
+    ctx.fillStyle='#5c6976'; ctx.font='16px Arial'; ctx.fillText('GeoEscape IPISA · Evidencia de aprendizaje cartográfico',80,1438);
+    const a=document.createElement('a'); a.download='geoescape-ipisa-v2.png'; a.href=canvas.toDataURL('image/png'); a.click();
+  };
+  img.src=MAP;
+}
+function resetApp(){
+  if(!confirm('¿Deseas reiniciar toda la actividad?')) return;
+  st.score={locate:0,think:0,escape:0,create:0}; st.selectedLearn=null; st.locatePool=[]; st.locateIndex=0; st.locateDone=false; st.locateHint=false; st.locateAttempts=0; st.thinkAns={}; st.locks={l1:false,l2:false,l3:false,l4:false}; st.destination=22; st.route=[1,22]; st.symbolMap={}; st.resultSaved=false;
+  $('studentName').value=''; $('studentCourse').value=''; $('teamCode').value=''; $('workTitle').value='Ruta guiada del IPISA dentro del campus'; $('difficulty').value='guiado';
+  go('home');
+}
+go('home');
+</script>
+</body>
+</html>
