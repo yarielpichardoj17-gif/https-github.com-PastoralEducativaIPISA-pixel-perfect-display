@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoEscape IPISA V2</title>
+<style>
+:root{
+  --bg:#f3f7fb;--card:#ffffff;--line:#dbe5ee;--text:#203344;--muted:#67788a;
+  --blue:#2f5f8a;--blue2:#e9f3fb;--green:#4a8464;--green2:#eaf7f0;
+  --gold:#f0c85a;--gold2:#fff8df;--red:#c05555;--red2:#fff0f0;--shadow:0 12px 35px rgba(28,56,82,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(140deg,#eef5fb 0%,#f9fcf9 100%);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1480px;margin:auto;padding:16px}
+.top{position:sticky;top:10px;z-index:50;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:18px;padding:14px 18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),#5092ba);color:#fff;font-size:24px}
+.brand h1{font-size:1rem;margin:0;color:#1e4967}
+.brand small{display:block;color:var(--muted)}
+.prog{flex:1;max-width:430px}
+.progHead{display:flex;justify-content:space-between;font-size:.83rem;color:var(--muted);margin-bottom:6px}
+.bar{height:10px;border-radius:999px;background:#e8eef4;overflow:hidden}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--green),#86c292);transition:.4s}
+.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:800;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translateY(-1px)}
+.bBlue{background:var(--blue);color:#fff}
+.bSoft{background:#f0f4f7;border:1px solid var(--line);color:#365169}
+.bGreen{background:var(--green);color:#fff}
+.bGold{background:var(--gold);color:#473a0d}
+.bRed{background:#f9e8e8;border:1px solid #efcbcb;color:#9e3535}
+.screen{display:none;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:22px;margin-top:18px;box-shadow:var(--shadow);overflow:hidden}
+.screen.active{display:block}
+.hero{padding:52px 28px;text-align:center;position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;opacity:.17}
+.hero:before{width:250px;height:250px;background:#8bc0e4;left:-80px;top:-100px}
+.hero:after{width:220px;height:220px;background:#89ca9a;right:-60px;bottom:-100px}
+.hero .icon{font-size:62px}
+.hero h2{font-size:clamp(2rem,5vw,3.8rem);margin:10px 0;color:#234963}
+.hero .sub{font-size:1.16rem;font-weight:800;color:var(--green)}
+.hero p{max-width:900px;margin:16px auto;line-height:1.65;color:#506272}
+.cardRow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:940px;margin:30px auto 0}
+.mini{background:#f8fbfd;border:1px solid var(--line);border-radius:16px;padding:16px}
+.mini strong{display:block;color:#234d6c;margin-bottom:6px}
+.pad{padding:24px}
+.section{display:flex;gap:12px;align-items:flex-start;margin-bottom:18px}
+.num{width:42px;height:42px;border-radius:13px;background:var(--blue2);color:var(--blue);display:grid;place-items:center;font-weight:900;flex:0 0 auto}
+.section h2{margin:0;color:#244964}
+.section p{margin:4px 0 0;color:var(--muted);line-height:1.55}
+.grid2{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+.gridM{display:grid;grid-template-columns:1.56fr .78fr;gap:18px;padding:22px}
+.panel,.side,.mapCard{background:#fff;border:1px solid var(--line);border-radius:18px}
+.panel{padding:18px;background:#f9fbfd}
+.side{padding:18px}
+.mapCard{padding:14px;box-shadow:0 8px 24px rgba(34,55,80,.08)}
+.panel h3,.side h3{margin-top:0;color:#294f6c}
+.steps{display:grid;gap:10px}
+.step{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fff;border:1px solid #e7edf3;border-radius:13px}
+.step b{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--green2);color:var(--green);flex:0 0 auto}
+.mapHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.mapHead h3{margin:0;color:#294e6a}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:.82rem;font-weight:800}
+.pBlue{background:var(--blue2);color:var(--blue)}
+.pGreen{background:var(--green2);color:var(--green)}
+.pGold{background:var(--gold2);color:#79611a}
+.small{font-size:.86rem;color:var(--muted)}
+.mapShell{position:relative;width:100%;aspect-ratio:1397/1126;background:#edf4f8;border-radius:16px;overflow:hidden;border:1px solid #ccd9e4}
+.mapShell img.base{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.dot{
+  position:absolute;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;
+  border:3px solid #fff;background:rgba(49,95,138,.88);box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:3
+}
+.dot.learn{background:rgba(49,95,138,.92)}
+.dot.quiz{background:rgba(81,105,125,.88)}
+.dot.correct{background:#4e8b69}
+.dot.wrong{background:#c35c5c}
+.dot.highlight{outline:5px solid rgba(49,95,138,.18)}
+.dot.hideNumber{font-size:0}
+.labelTag{
+  position:absolute;transform:translate(-50%,-135%);padding:4px 8px;border-radius:999px;
+  background:rgba(255,255,255,.96);border:1px solid var(--line);font-size:.78rem;font-weight:800;color:#264e6c;white-space:nowrap;z-index:4
+}
+.placeList{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:380px;overflow:auto;padding-right:3px}
+.placeBtn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 10px;text-align:left;font-weight:700;color:#334b5e}
+.placeBtn.active{background:var(--blue2);border-color:#a7c8e4}
+.info{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px}
+.info h4{margin:0 0 6px;color:#25506f}
+.info p{margin:6px 0;color:#50606f;line-height:1.5}
+.fg{margin:14px 0}
+.fg label{display:block;font-weight:800;color:#345169;margin-bottom:7px}
+.input,.select,textarea{width:100%;border:1px solid #cfdbe3;border-radius:11px;padding:11px 12px;background:#fff;color:#253748}
+.input:focus,.select:focus,textarea:focus{outline:3px solid rgba(47,95,138,.13);border-color:var(--blue)}
+textarea{min-height:120px;resize:vertical}
+.feedback{display:none;margin:12px 0;padding:12px 14px;border-radius:12px;font-weight:700;line-height:1.4}
+.feedback.show{display:block}
+.ok{background:var(--green2);color:#2d6a49;border:1px solid #b9dcc7}
+.warn{background:var(--gold2);color:#6e5918;border:1px solid #ecdd9d}
+.err{background:var(--red2);color:#933b3b;border:1px solid #efc9c9}
+.question{padding:14px;background:#f8fafc;border:1px solid var(--line);border-radius:14px;margin:12px 0}
+.options{display:grid;gap:8px;margin-top:10px}
+.option{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 12px;text-align:left;font-weight:700;color:#33495d}
+.option.selected{border-color:#88afcf;background:var(--blue2)}
+.option.good{border-color:#87bd98;background:var(--green2)}
+.option.bad{border-color:#e7a2a2;background:#fff1f1}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.score{background:linear-gradient(135deg,#244b6c,#4f88ae);color:#fff;border-radius:18px;padding:20px;text-align:center}
+.score .big{font-size:3.5rem;font-weight:900;line-height:1}
+.locks{display:grid;gap:12px}
+.lock{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.lock.done{background:#f5fbf7;border-color:#9eceaf}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;background:#f4f7fa;border:1px solid var(--line);border-radius:999px;font-size:.82rem}
+.routeTags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.routeTags span{background:#eef4f7;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:.83rem;font-weight:800}
+.symbolRow{display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;margin:8px 0}
+.resultGrid{display:grid;grid-template-columns:.74fr 1.26fr;gap:20px}
+.resultList{display:grid;gap:9px;margin-top:14px}
+.resultItem{display:flex;justify-content:space-between;gap:12px;padding:11px;border-radius:12px;background:#f8fafc;border:1px solid var(--line)}
+.evidence{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}
+.evidence h3{text-align:center;color:#25506d;margin-top:0}
+.table{width:100%;border-collapse:collapse;margin-top:14px}
+.table th,.table td{border:1px solid var(--line);padding:9px;text-align:left;font-size:.9rem}
+.table th{background:#eef4f8;color:#2b506c}
+.modal{display:none;position:fixed;inset:0;z-index:70;background:rgba(22,37,52,.58);align-items:center;justify-content:center;padding:18px}
+.modal.show{display:flex}
+.modalContent{width:min(950px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:20px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.22)}
+.modalHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.close{width:38px;height:38px;border:none;border-radius:11px;background:#eef3f6}
+.teacherTable{width:100%;border-collapse:collapse}
+.teacherTable th,.teacherTable td{border:1px solid var(--line);padding:9px;font-size:.9rem}
+.teacherTable th{background:#eef4f8}
+.footer{text-align:center;padding:14px;color:#6a7785;font-size:.85rem}
+
+.recordsToolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.recordsSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.recordsSummary .miniStat{background:#f7fafc;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.recordsSummary .miniStat strong{display:block;font-size:1.5rem;color:#244d69}
+.recordsTableWrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+.recordsTable{width:100%;border-collapse:collapse;min-width:1050px}
+.recordsTable th,.recordsTable td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;font-size:.86rem;white-space:nowrap}
+.recordsTable th{position:sticky;top:0;background:#eef4f8;color:#294f6c;z-index:1}
+.recordsTable tr:last-child td{border-bottom:none}
+.emptyState{text-align:center;padding:28px;color:var(--muted)}
+@media(max-width:720px){.recordsSummary{grid-template-columns:1fr}}
+
+@media(max-width:1020px){
+  .gridM,.grid2,.resultGrid{grid-template-columns:1fr}
+  .prog{display:none}
+}
+@media(max-width:720px){
+  .app{padding:8px}
+  .hero{padding:36px 18px}
+  .cardRow{grid-template-columns:1fr}
+  .gridM,.pad{padding:14px}
+  .placeList{grid-template-columns:1fr}
+  .brand small{display:none}
+}
+@media print{
+  body{background:#fff}
+  .top,.screen:not(#screen-final),.printHide,.footer{display:none!important}
+  #screen-final{display:block!important;border:none;box-shadow:none;margin:0}
+  .app{max-width:none;padding:0}
+  .resultGrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🧭</div>
+      <div><h1>GeoEscape IPISA · V2</h1><small>Más centrado en la competencia de ubicación geográfica</small></div>
+    </div>
+    <div class="prog">
+      <div class="progHead"><span id="progLabel">Inicio</span><span id="scoreTop">0/100</span></div>
+      <div class="bar"><div id="progBar"></div></div>
+    </div>
+    <div class="buttons">
+      <a class="btn bSoft" href="https://geoescape-ipisa.lovable.app/docente" target="_blank" rel="noopener noreferrer">🔒 Acceso docente</a>
+      <button class="btn bSoft" onclick="openTeacher()">👩‍🏫 Docente</button>
+      <button class="btn bRed" onclick="resetApp()">↻ Reiniciar</button>
+    </div>
+  </header>
+
+  <section id="screen-home" class="screen active">
+    <div class="hero">
+      <div class="icon">🗺️🔐</div>
+      <div class="sub">Ubica, orienta, compara, decide y representa el espacio del IPISA.</div>
+      <h2>GeoEscape IPISA</h2>
+      <p>
+        Esta versión trabaja la competencia de ubicación geográfica más allá del simple reconocimiento de lugares.
+        Aquí el estudiante debe localizar espacios, interpretar orientaciones, seleccionar puntos de referencia,
+        resolver un escape room cartográfico y construir una ruta guiada hacia distintos espacios importantes del IPISA.
+      </p>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px">
+        <button class="btn bBlue" onclick="go('setup')">Comenzar misión 🚀</button>
+        <button class="btn bSoft" onclick="openTeacher()">Ver guía docente</button>
+      </div>
+      <div class="cardRow">
+        <div class="mini"><strong>📍 Ubicación real</strong><span>Trabaja con el mapa del IPISA sin números visibles.</span></div>
+        <div class="mini"><strong>🧠 Pensamiento espacial</strong><span>Incluye relaciones, rutas, orientación y puntos de referencia.</span></div>
+        <div class="mini"><strong>🖨 Evidencia final</strong><span>Genera un producto imprimible con ruta y explicación.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-setup" class="screen">
+    <div class="pad">
+      <div class="section">
+        <div class="num">0</div>
+        <div>
+          <h2>Preparación</h2>
+          <p>Escribe un título para la evidencia final y define el nivel de apoyo deseado.</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h3>Secuencia didáctica</h3>
+          <div class="steps">
+            <div class="step"><b>1</b><div><strong>Explora el mapa.</strong><br><span class="small">Conoce los principales espacios del IPISA.</span></div></div>
+            <div class="step"><b>2</b><div><strong>Localiza y selecciona.</strong><br><span class="small">Identifica lugares sin apoyarte en números visibles.</span></div></div>
+            <div class="step"><b>3</b><div><strong>Piensa espacialmente.</strong><br><span class="small">Responde preguntas de orientación, cercanía y relaciones.</span></div></div>
+            <div class="step"><b>4</b><div><strong>Escapa cartográficamente.</strong><br><span class="small">Resuelve cerraduras con pistas del espacio escolar.</span></div></div>
+            <div class="step"><b>5</b><div><strong>Representa una ruta.</strong><br><span class="small">Diseña una guía hacia distintos espacios importantes del campus.</span></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="fg">
+            <label for="studentName">Nombre del estudiante</label>
+            <input id="studentName" class="input" maxlength="80" placeholder="Nombre y apellido">
+          </div>
+          <div class="fg">
+            <label for="studentCourse">Curso / sección</label>
+            <input id="studentCourse" class="input" maxlength="50" placeholder="Ej.: 4to DAAI A">
+          </div>
+          <div class="fg">
+            <label for="teamCode">Código del equipo (opcional)</label>
+            <input id="teamCode" class="input" maxlength="30" placeholder="Ej.: Equipo 4">
+          </div>
+          <div class="fg">
+            <label for="workTitle">Título de la evidencia</label>
+            <input id="workTitle" class="input" maxlength="80" value="Ruta guiada del IPISA dentro del campus">
+          </div>
+          <div class="fg">
+            <label for="difficulty">Nivel de apoyo</label>
+            <select id="difficulty" class="select">
+              <option value="guiado">Guiado</option>
+              <option value="desafio">Desafío</option>
+            </select>
+          </div>
+          <p class="small">La parte superior del mapa representa el norte. El nombre y curso se guardan únicamente en este navegador para el registro docente; no se envían a internet.</p>
+          <div class="nav">
+            <button class="btn bSoft" onclick="go('home')">← Volver</button>
+            <button class="btn bBlue" onclick="startApp()">Explorar el mapa →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-explore" class="screen">
+    <div class="gridM">
+      <div class="mapCard">
+        <div class="mapHead">
+          <h3>Exploración guiada del mapa del IPISA</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill pBlue">Norte arriba</span>
+            <span class="pill pGreen">Haz clic en un punto o en el listado</span>
+          </div>
+        </div>
+        <div id="mapExplore" class="mapShell"></div>
+      </div>
+      <div class="side">
+        <span class="pill pBlue">Etapa 1 de 5</span>
+        <h3>Conoce los espacios</h3>
+        <p>Los puntos del mapa son anónimos para favorecer la observación. Selecciona un espacio y analiza su posición.</p>
+        <div class="fg">
+          <label for="searchPlace">Selecciona un espacio</label>
+          <select id="searchPlace" class="select" onchange="selectLearnPlace(parseInt(this.value))"></select>
+        </div>
+        <div id="learnInfo" class="info">
+          <h4>Selecciona un espacio</h4>
+          <p>Aquí aparecerá la información del lugar escogido.</p>
+        </div>
+        <div class="fg">
+          <label>Listado general</label>
+          <div id="placeList" class="placeList"></div>
+        </div>
+        <div class="nav">
+          <button class="btn bSoft" onclick="go('setup')">← Volver</button>
+          <button class="btn bBlue" onclick="prepareLocate()">Ir al reto de ubicación →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-locate" class="screen">
+    <div class="gridM">
+      <div class="mapCard">
+        <div class="mapHead">
+          <h3>Reto de ubicación</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill pBlue" id="locProgress">Pregunta 1</span>
+            <span class="pill pGold">Haz clic en el punto correcto</span>
+          </div>
+        </div>
+        <div id="mapLocate" class="mapShell"></div>
+      </div>
+      <div class="side">
+        <span class="pill pBlue">Etapa 2 de 5</span>
+        <h3 id="locQuestion">Pregunta</h3>
+        <p class="small">No hay números visibles. Observa la posición relativa de los espacios dentro del IPISA.</p>
+        <div id="locHintBox" class="info" style="display:none">
+          <h4>Pista</h4>
+          <p id="locHintText"></p>
+        </div>
+        <div id="locFeedback" class="feedback"></div>
+        <div class="score" style="margin-top:12px">
+          <div class="small" style="color:#dcebf6">Puntos de esta etapa</div>
+          <div class="big" id="locScore">0</div>
+          <div>máximo 30 puntos</div>
+        </div>
+        <div class="nav">
+          <button class="btn bGold" onclick="useLocateHint()">Solicitar pista</button>
+          <button class="btn bSoft" onclick="go('explore')">← Volver</button>
+          <button class="btn bBlue" id="nextLocateBtn" onclick="nextLocate()" disabled>Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-think" class="screen">
+    <div class="pad">
+      <div class="section">
+        <div class="num">🧠</div>
+        <div>
+          <h2>Piensa espacialmente</h2>
+          <p>Responde preguntas que exigen orientación, selección de referencias y comprensión de relaciones espaciales.</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div id="thinkWrap"></div>
+          <div id="thinkFeedback" class="feedback"></div>
+        </div>
+        <div class="panel">
+          <h3>¿Qué se está evaluando aquí?</h3>
+          <p>No basta con reconocer nombres. Debes razonar desde dónde estás, hacia dónde te desplazas y qué puntos te ayudan a orientarte.</p>
+          <div class="score">
+            <div class="small" style="color:#dcebf6">Puntaje de esta etapa</div>
+            <div class="big" id="thinkScore">0</div>
+            <div>máximo 25 puntos</div>
+          </div>
+          <div class="nav">
+            <button class="btn bSoft" onclick="go('locate')">← Volver</button>
+            <button class="btn bBlue" onclick="validateThink()">Validar respuestas →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-escape" class="screen">
+    <div class="gridM">
+      <div class="mapCard">
+        <div class="mapHead">
+          <h3>Escape room: El plano perdido</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill pGold">4 cerraduras cartográficas</span>
+            <span class="pill pBlue">Sin cronómetro</span>
+          </div>
+        </div>
+        <div id="mapEscape" class="mapShell"></div>
+      </div>
+      <div class="side">
+        <span class="pill pBlue">Etapa 4 de 5</span>
+        <h3>Desbloquea el plano</h3>
+        <p>Las pistas no exigen solo memorizar nombres; debes interpretar la organización espacial del campus.</p>
+        <div class="locks">
+          <div class="lock" id="lock1">
+            <strong>🔒 Cerradura 1</strong>
+            <p>Haz clic en el lugar por donde ingresan normalmente los estudiantes al IPISA.</p>
+            <div id="lock1Status" class="small">Esperando respuesta…</div>
+          </div>
+          <div class="lock" id="lock2">
+            <strong>🔒 Cerradura 2</strong>
+            <p>¿Qué espacio se encuentra al este de la Biblioteca y funciona como servicio de alimentos ligeros?</p>
+            <div class="options" id="lock2Opts">
+              <button class="option" onclick="solveLock2(this,'Cafetería')">Cafetería</button>
+              <button class="option" onclick="solveLock2(this,'Comedor')">Comedor</button>
+              <button class="option" onclick="solveLock2(this,'Salón Abierto')">Salón Abierto</button>
+            </div>
+            <div id="lock2Status" class="small">Selecciona una opción.</div>
+          </div>
+          <div class="lock" id="lock3">
+            <strong>🔒 Cerradura 3</strong>
+            <p>Con la cuadrícula activa, ¿en qué coordenada aproximada se ubica la Cancha Grande?</p>
+            <div class="options" id="lock3Opts">
+              <button class="option" onclick="solveLock3(this,'F1')">F1</button>
+              <button class="option" onclick="solveLock3(this,'E2')">E2</button>
+              <button class="option" onclick="solveLock3(this,'D1')">D1</button>
+            </div>
+            <div id="lock3Status" class="small">Observa la zona superior derecha del mapa.</div>
+          </div>
+          <div class="lock" id="lock4">
+            <strong>🔒 Cerradura 4</strong>
+            <p>Si partes desde la Entrada General hacia una zona académica del centro, ¿qué punto de referencia es más útil como orientación intermedia?</p>
+            <div class="options" id="lock4Opts">
+              <button class="option" onclick="solveLock4(this,'Cancha de baloncesto pequeña')">Cancha de baloncesto pequeña</button>
+              <button class="option" onclick="solveLock4(this,'Aulas B')">Aulas B</button>
+              <button class="option" onclick="solveLock4(this,'Salida trasera')">Salida trasera</button>
+            </div>
+            <div id="lock4Status" class="small">Selecciona la mejor referencia.</div>
+          </div>
+        </div>
+        <div class="fg">
+          <label for="finalCode">Código final del plano</label>
+          <input id="finalCode" class="input" placeholder="Introduce las 4 claves en el orden de las cerraduras">
+          <div class="small">Se forma con las claves reveladas en las cuatro cerraduras.</div>
+        </div>
+        <div id="escapeFeedback" class="feedback"></div>
+        <div class="nav">
+          <button class="btn bSoft" onclick="go('think')">← Volver</button>
+          <button class="btn bBlue" onclick="validateEscape()">Desbloquear plano →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-create" class="screen">
+    <div class="gridM">
+      <div class="mapCard">
+        <div class="mapHead">
+          <h3>Misión final: ruta guiada</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="pill pGreen">Inicio: Entrada General</span>
+            <span class="pill pBlue" id="destPill">Destino: Laboratorio de Informática</span>
+          </div>
+        </div>
+        <div id="mapCreate" class="mapShell"></div>
+      </div>
+      <div class="side">
+        <span class="pill pBlue">Etapa 5 de 5</span>
+        <h3>Representa el espacio para orientar</h3>
+        <p>Selecciona un destino, marca dos puntos de referencia intermedios, asigna símbolos y explica cómo tu ruta ayuda a un visitante a ubicarse.</p>
+        <div class="fg">
+          <label for="destSelect">Selecciona el destino de la misión</label>
+          <select id="destSelect" class="select" onchange="changeDestination(this.value)"></select>
+        </div>
+        <div class="fg">
+          <label>Selecciona dos puntos de referencia para la ruta</label>
+          <select id="ref1" class="select"></select>
+          <select id="ref2" class="select" style="margin-top:8px"></select>
+          <div class="routeTags" id="routeTags"></div>
+          <button class="btn bGold" style="margin-top:10px" onclick="drawRoute()">Dibujar ruta</button>
+        </div>
+        <div class="fg">
+          <label>Asigna símbolos cartográficos</label>
+          <div id="symbolBuilder"></div>
+          <div id="legendPreview" class="legend"></div>
+        </div>
+        <div class="fg">
+          <label for="explanation">Explicación cartográfica</label>
+          <textarea id="explanation" placeholder="Explica la ruta, los puntos de referencia elegidos, la orientación general y cómo esta representación ayuda a ubicarse."></textarea>
+          <div class="small"><span id="charCount">0</span> caracteres.</div>
+        </div>
+        <div id="createFeedback" class="feedback"></div>
+        <div class="nav">
+          <button class="btn bSoft" onclick="go('escape')">← Volver</button>
+          <button class="btn bGreen" onclick="validateCreate()">Generar evidencia final ✓</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-final" class="screen">
+    <div class="pad">
+      <div class="section">
+        <div class="num">🏁</div>
+        <div>
+          <h2>Misión completada</h2>
+          <p>Esta evidencia resume el trabajo realizado sobre el mapa del IPISA y la competencia de ubicación geográfica.</p>
+        </div>
+      </div>
+      <div class="resultGrid">
+        <div>
+          <div class="score">
+            <div class="small" style="color:#dcebf6">Puntuación final</div>
+            <div class="big" id="finalScore">0</div>
+            <div id="finalLevel" style="font-size:1.15rem;font-weight:800;margin-top:6px">Explorador cartográfico</div>
+            <div id="finalBadge" style="font-size:2rem;margin-top:10px">🧭</div>
+          </div>
+          <div class="panel" style="margin-top:14px">
+            <h3>Resumen del desempeño</h3>
+            <div id="summaryList" class="resultList"></div>
+          </div>
+          <div class="panel printHide" style="margin-top:14px">
+            <h3>Acciones</h3>
+            <div style="display:grid;gap:8px">
+              <button class="btn bBlue" onclick="downloadEvidence()">⬇ Guardar evidencia como PNG</button>
+              <button class="btn bSoft" onclick="window.print()">🖨 Imprimir</button>
+              <button class="btn bRed" onclick="resetApp()">↻ Reiniciar actividad</button>
+            </div>
+          </div>
+        </div>
+        <div class="evidence">
+          <h3 id="evTitle"></h3>
+          <div class="small" style="text-align:center;margin-bottom:5px"><strong id="evStudent"></strong> · <span id="evCourse"></span></div>
+          <div class="small" style="text-align:center;margin-bottom:10px"><span id="evTeam"></span> · <span id="evDate"></span></div>
+          <div id="mapFinal" class="mapShell"></div>
+          <div class="legend" id="finalLegend"></div>
+          <div class="info" style="margin-top:12px">
+            <h4>Explicación del estudiante</h4>
+            <p id="evExplanation"></p>
+          </div>
+          <table class="table">
+            <thead><tr><th>Aspecto</th><th>Resultado</th></tr></thead>
+            <tbody id="criteriaBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">GeoEscape IPISA · Versión mejorada con coordenadas más visibles y destinos variados.</div>
+</div>
+
+
+
+<div id="teacherLoginModal" class="modal">
+  <div class="modalContent" style="width:min(470px,100%)">
+    <div class="modalHead">
+      <div>
+        <h2 style="margin:0">Acceso docente</h2>
+        <div class="small">Esta sección contiene los resultados guardados.</div>
+      </div>
+      <button class="close" onclick="closeTeacherLogin()">✕</button>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <div class="fg">
+        <label for="teacherUser">Usuario</label>
+        <input id="teacherUser" class="input" autocomplete="username" placeholder="Usuario docente">
+      </div>
+      <div class="fg">
+        <label for="teacherPin">PIN</label>
+        <input id="teacherPin" class="input" type="password" inputmode="numeric" maxlength="12" autocomplete="current-password" placeholder="PIN docente">
+      </div>
+      <div id="teacherLoginFeedback" class="feedback"></div>
+      <div class="nav">
+        <button class="btn bSoft" onclick="closeTeacherLogin()">Cancelar</button>
+        <button class="btn bBlue" onclick="teacherLogin()">Entrar a resultados →</button>
+      </div>
+    </div>
+    <p class="small" style="margin-top:12px">
+      El acceso protege la tabla durante el uso normal de la app. Como la aplicación funciona en un solo archivo sin servidor,
+      no sustituye un sistema de autenticación institucional.
+    </p>
+  </div>
+</div>
+
+<div id="recordsModal" class="modal">
+  <div class="modalContent" style="width:min(1220px,100%)">
+    <div class="modalHead">
+      <div><h2 style="margin:0">Registro de resultados</h2><div class="small">Los resultados se guardan de forma central para consulta docente.</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn bSoft" style="padding:8px 10px" onclick="teacherLogout()">Cerrar sesión</button>
+        <button class="close" onclick="closeRecords()">✕</button>
+      </div>
+    </div>
+    <div class="recordsSummary">
+      <div class="miniStat"><strong id="recordCount">0</strong><span>entregas guardadas</span></div>
+      <div class="miniStat"><strong id="recordAverage">0</strong><span>promedio general</span></div>
+      <div class="miniStat"><strong id="recordBest">0</strong><span>mejor puntuación</span></div>
+    </div>
+    <div class="recordsToolbar">
+      <button class="btn bBlue" onclick="exportRecordsCSV()">⬇ Exportar CSV</button>
+      <button class="btn bSoft" onclick="exportRecordsJSON()">💾 Copia JSON</button>
+      <button class="btn bSoft" onclick="importRecordsJSON()">📥 Importar JSON</button>
+      <button class="btn bRed" onclick="clearRecords()">🗑 Borrar historial</button>
+      <input id="recordsImportFile" type="file" accept=".json,application/json" style="display:none" onchange="handleRecordsImport(event)">
+    </div>
+    <div class="recordsTableWrap">
+      <table class="recordsTable">
+        <thead><tr><th>Fecha y hora</th><th>Estudiante</th><th>Curso / sección</th><th>Equipo</th><th>Destino</th><th>Ubicación</th><th>Orientación</th><th>Escape</th><th>Representación</th><th>Total</th></tr></thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+      <div id="recordsEmpty" class="emptyState">Todavía no hay resultados guardados.</div>
+    </div>
+    <p class="small" style="margin-top:12px">Importante: si se usa en varias computadoras, cada equipo tendrá su propio historial. Exporta CSV o una copia JSON para reunir los resultados.</p>
+  </div>
+</div>
+
+<div id="teacherModal" class="modal">
+  <div class="modalContent">
+    <div class="modalHead">
+      <h2>Guía docente y sugerencias didácticas</h2>
+      <button class="close" onclick="closeTeacher()">✕</button>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="panel">
+        <h3>Qué competencia trabaja mejor esta versión</h3>
+        <p>Esta app ya no se centra solo en “reconocer lugares”. Busca que el estudiante <strong>observe, ubique, relacione, escoja referencias, trace rutas y explique su representación espacial</strong>.</p>
+        <p>Para fortalecer todavía más la intervención, es ideal complementar la app con una <strong>discusión oral</strong> o un <strong>croquis breve en papel o digital</strong> al finalizar.</p><p><strong>Registro:</strong> cada entrega final se guarda automáticamente en el navegador. El docente puede entrar mediante <em>Acceso docente</em> y exportar el historial a CSV. La tabla está protegida por usuario y PIN.</p>
+      </div>
+      <div class="panel">
+        <h3>Lista de cotejo</h3>
+        <table class="teacherTable">
+          <thead><tr><th>Indicador</th><th>Sí</th><th>En proceso</th><th>No</th></tr></thead>
+          <tbody>
+            <tr><td>Reconoce espacios importantes del IPISA.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Ubica correctamente varios espacios clave del IPISA desde la Entrada General.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Usa relaciones espaciales (norte, este, cercanía, entre, hacia).</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Selecciona puntos de referencia pertinentes.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Traza o comprende una ruta lógica.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Asigna símbolos cartográficos con coherencia.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+            <tr><td>Explica su representación visual con claridad.</td><td>☐</td><td>☐</td><td>☐</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px">
+      <button class="btn bBlue" onclick="closeTeacher()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MAP = "assets/croquis-ipisa.png"";
+const PLACES = [{"id": 1, "name": "Entrada General", "x": 64.8, "y": 97.6, "cat": "Acceso", "desc": "Punto de ingreso principal al campus."}, {"id": 2, "name": "Estacionamiento", "x": 74.7, "y": 90.8, "cat": "Servicio", "desc": "Zona donde se estacionan los vehículos."}, {"id": 3, "name": "Edificio Administrativo", "x": 63.4, "y": 85.5, "cat": "Administrativo", "desc": "Área administrativa del IPISA."}, {"id": 4, "name": "Taller de Electromecánica de Vehículos", "x": 47.3, "y": 80.3, "cat": "Taller", "desc": "Espacio formativo del área de electromecánica de vehículos."}, {"id": 5, "name": "Campo de Fútbol pequeño", "x": 86.0, "y": 79.0, "cat": "Deportivo", "desc": "Área deportiva abierta de menor tamaño."}, {"id": 6, "name": "Salón Padre Taveras", "x": 68.6, "y": 72.8, "cat": "Salón", "desc": "Salón de actividades y encuentros."}, {"id": 7, "name": "Salón de Usos Múltiples (SUM)", "x": 74.2, "y": 62.7, "cat": "Salón", "desc": "Espacio multiuso para actividades diversas."}, {"id": 8, "name": "Cancha de baloncesto pequeña", "x": 61.3, "y": 61.9, "cat": "Deportivo", "desc": "Cancha pequeña destinada a baloncesto."}, {"id": 9, "name": "Área verde", "x": 55.7, "y": 61.6, "cat": "Área verde", "desc": "Zona abierta de vegetación y recreación."}, {"id": 10, "name": "Taller de Confección y Patronaje", "x": 49.0, "y": 64.7, "cat": "Taller", "desc": "Taller del área de confección y patronaje."}, {"id": 11, "name": "Capilla Escolar", "x": 37.8, "y": 67.4, "cat": "Religioso", "desc": "Espacio de oración y reflexión de la comunidad educativa."}, {"id": 12, "name": "Campo de fútbol grande", "x": 19.4, "y": 75.0, "cat": "Deportivo", "desc": "Campo amplio para actividades de fútbol."}, {"id": 13, "name": "Taller de Muebles y Estructura de la Madera", "x": 31.4, "y": 52.4, "cat": "Taller", "desc": "Taller del área de madera, muebles y estructuras."}, {"id": 14, "name": "Taller de Instalaciones Eléctricas", "x": 45.0, "y": 49.8, "cat": "Taller", "desc": "Taller técnico del área de instalaciones eléctricas."}, {"id": 15, "name": "Salida trasera", "x": 65.9, "y": 4.4, "cat": "Acceso", "desc": "Salida ubicada en la parte superior del campus."}, {"id": 16, "name": "Biblioteca", "x": 58.0, "y": 41.3, "cat": "Académico", "desc": "Espacio de consulta, lectura y estudio."}, {"id": 17, "name": "Pastoral Educativa", "x": 68.0, "y": 48.6, "cat": "Servicio", "desc": "Área de acompañamiento pastoral y formativo."}, {"id": 18, "name": "Cafetería", "x": 81.6, "y": 41.8, "cat": "Servicio", "desc": "Espacio de venta y servicio de alimentos ligeros."}, {"id": 19, "name": "Comedor", "x": 91.3, "y": 41.9, "cat": "Servicio", "desc": "Área destinada al comedor."}, {"id": 20, "name": "Salón Abierto", "x": 78.1, "y": 33.0, "cat": "Salón", "desc": "Espacio abierto para actividades escolares."}, {"id": 21, "name": "Cancha de Voleyball", "x": 65.8, "y": 36.7, "cat": "Deportivo", "desc": "Cancha destinada a voleibol."}, {"id": 22, "name": "Laboratorio de Informática", "x": 58.3, "y": 39.0, "cat": "Académico", "desc": "Laboratorio de informática del centro educativo."}, {"id": 23, "name": "Departamento de Registro", "x": 55.8, "y": 32.8, "cat": "Administrativo", "desc": "Departamento encargado del registro académico."}, {"id": 24, "name": "Taller de Equipos Electrónicos", "x": 41.6, "y": 30.8, "cat": "Taller", "desc": "Taller del área de equipos electrónicos."}, {"id": 25, "name": "Comunidad Salesiana", "x": 9.4, "y": 39.8, "cat": "Comunidad", "desc": "Espacio relacionado con la comunidad salesiana."}, {"id": 26, "name": "Taller de Mecanizado", "x": 33.0, "y": 23.7, "cat": "Taller", "desc": "Taller técnico de mecanizado."}, {"id": 27, "name": "Aulas A", "x": 49.0, "y": 22.5, "cat": "Académico", "desc": "Bloque de Aulas A."}, {"id": 28, "name": "Laboratorio de Ciencias Naturales", "x": 58.0, "y": 17.7, "cat": "Académico", "desc": "Laboratorio de ciencias naturales."}, {"id": 29, "name": "Laboratorio de Principios Tecnológicos", "x": 62.4, "y": 27.2, "cat": "Académico", "desc": "Laboratorio de principios tecnológicos."}, {"id": 30, "name": "Aulas C", "x": 63.6, "y": 18.6, "cat": "Académico", "desc": "Bloque de Aulas C."}, {"id": 31, "name": "Cancha Grande", "x": 84.0, "y": 16.2, "cat": "Deportivo", "desc": "Cancha deportiva principal."}, {"id": 32, "name": "Aulas B", "x": 95.0, "y": 16.5, "cat": "Académico", "desc": "Bloque de Aulas B."}, {"id": 33, "name": "Edificio María Auxiliadora", "x": 23.7, "y": 9.0, "cat": "Académico", "desc": "Edificio María Auxiliadora."}];
+const THINK = [{"q": "Si te encuentras en la Entrada General y deseas llegar a la Biblioteca, ¿hacia qué dirección general te desplazas?", "options": ["Hacia el noreste", "Hacia el noroeste", "Hacia el sureste", "Hacia el suroeste"], "answer": "Hacia el noreste"}, {"q": "¿Qué espacio funciona mejor como punto de referencia intermedio para orientar a un visitante hacia la Cafetería?", "options": ["Biblioteca", "Aulas B", "Campo de fútbol grande", "Salida trasera"], "answer": "Biblioteca"}, {"q": "¿Qué servicio se ubica entre Pastoral Educativa y Comedor?", "options": ["Biblioteca", "Cafetería", "Salón Abierto", "Departamento de Registro"], "answer": "Cafetería"}, {"q": "¿Cuál espacio está más al norte que la Biblioteca?", "options": ["Capilla Escolar", "Laboratorio de Ciencias Naturales", "Campo de fútbol grande", "Edificio Administrativo"], "answer": "Laboratorio de Ciencias Naturales"}, {"q": "Si un estudiante quiere ir desde la Biblioteca a la Cafetería, ¿cuál relación espacial describe mejor ese desplazamiento?", "options": ["Se mueve hacia el este", "Se mueve hacia el oeste", "Se mueve hacia el norte", "Se mueve hacia el suroeste"], "answer": "Se mueve hacia el este"}];
+const ESSENTIAL = [1, 3, 16, 18, 22, 31];
+const SYMBOLS = ["🚪","🅿️","🏢","📚","💻","🍽️","🏀","⚽","✝️","🌳","⭐","🧭"];
+
+const st = {
+  score:{locate:0,think:0,escape:0,create:0},
+  selectedLearn:null,
+  locatePool:[],
+  locateIndex:0,
+  locateDone:false,
+  locateHint:false,
+  locateAttempts:0,
+  locateCurrentMark:null,
+  thinkAns:{},
+  locks:{l1:false,l2:false,l3:false,l4:false},
+  destination:22,
+  route:[1,22],
+  symbolMap:{},
+  resultSaved:false
+};
+
+function $(id){return document.getElementById(id)}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function place(id){return PLACES.find(p=>p.id===id)}
+function total(){return st.score.locate+st.score.think+st.score.escape+st.score.create}
+function go(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('screen-'+screen).classList.add('active');
+  const steps={home:0,setup:5,explore:18,locate:36,think:56,escape:76,create:90,final:100};
+  const names={home:'Inicio',setup:'Preparación',explore:'Exploración',locate:'Ubicación',think:'Relaciones espaciales',escape:'Escape room',create:'Representación final',final:'Final'};
+  $('progBar').style.width=(steps[screen]||0)+'%';
+  $('progLabel').textContent=names[screen]||'Actividad';
+  $('scoreTop').textContent=total()+'/100';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function zone(p){
+  const ns = p.y < 33 ? 'norte' : (p.y > 66 ? 'sur' : 'zona central');
+  const ew = p.x < 33 ? 'oeste' : (p.x > 66 ? 'este' : 'centro');
+  return `Se ubica en la ${ns} del campus, hacia el ${ew}.`;
+}
+function coordApprox(p){
+  const cols=['A','B','C','D','E','F'];
+  const col=Math.min(5,Math.max(0,Math.floor(p.x/(100/6))));
+  const row=Math.min(4,Math.max(0,Math.floor(p.y/(100/5))));
+  return cols[col]+(row+1);
+}
+function renderMap(id,cfg={}){
+  const box=$(id);
+  const route=cfg.route||[];
+  const highlight=cfg.highlight||[];
+  const labels=cfg.labels||[];
+  const showGrid=cfg.showGrid||false;
+  let html=`<img class="base" src="${MAP}" alt="Mapa del IPISA">`;
+  html+=`<svg class="overlay" viewBox="0 0 100 100" preserveAspectRatio="none">`;
+  if(showGrid){
+    for(let i=0;i<=6;i++){const x=i*(100/6); html+=`<line x1="${x}" y1="0" x2="${x}" y2="100" stroke="rgba(255,255,255,.85)" stroke-width=".25"/>`;}
+    for(let j=0;j<=5;j++){const y=j*(100/5); html+=`<line x1="0" y1="${y}" x2="100" y2="${y}" stroke="rgba(255,255,255,.85)" stroke-width=".25"/>`;}
+    ['A','B','C','D','E','F'].forEach((c,i)=> html+=`<text x="${(i+.5)*(100/6)}" y="3.2" text-anchor="middle" font-size="2.7" fill="#fff36d" stroke="#10283f" stroke-width=".22" paint-order="stroke" font-weight="900">${c}</text>`);
+    for(let j=0;j<5;j++){ html+=`<text x="1.8" y="${(j+.5)*(100/5)}" text-anchor="middle" font-size="2.7" fill="#fff36d" stroke="#10283f" stroke-width=".22" paint-order="stroke" font-weight="900">${j+1}</text>`; }
+  }
+  if(route.length>1){
+    const pts=route.map(id=>{const p=place(id); return `${p.x},${p.y}`}).join(' ');
+    html+=`<polyline points="${pts}" fill="none" stroke="#f39a25" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+    route.forEach((id,idx)=>{
+      const p=place(id);
+      html+=`<circle cx="${p.x}" cy="${p.y}" r="1.05" fill="#fff" stroke="#ba6a12" stroke-width=".35"/>`;
+    });
+  }
+  html+='</svg>';
+  PLACES.forEach(p=>{
+    let cls='dot ' + (cfg.mode==='explore' ? 'learn' : 'quiz');
+    if(highlight.includes(p.id)) cls+=' highlight';
+    if(cfg.correct && cfg.correct===p.id) cls+=' correct';
+    if(cfg.wrong && cfg.wrong===p.id) cls+=' wrong';
+    html+=`<button class="${cls}" style="left:${p.x}%;top:${p.y}%;" data-id="${p.id}" aria-label="${esc(p.name)}"></button>`;
+    if(labels.includes(p.id)){
+      html+=`<div class="labelTag" style="left:${p.x}%;top:${p.y}%;">${esc(p.name)}</div>`;
+    }
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('.dot').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=parseInt(btn.dataset.id);
+      if(id && cfg.mode==='explore') selectLearnPlace(id);
+      if(id && cfg.mode==='locate') clickLocate(id);
+      if(id && cfg.mode==='escape') clickEscape(id);
+    });
+  });
+}
+function startApp(){
+  if(!$('studentName').value.trim()){ alert('Escribe el nombre del estudiante.'); $('studentName').focus(); return; }
+  if(!$('studentCourse').value.trim()){ alert('Escribe el curso o sección.'); $('studentCourse').focus(); return; }
+  if(!$('workTitle').value.trim()){ alert('Escribe un título para la evidencia final.'); return; }
+  st.resultSaved=false;
+  initExplore();
+  go('explore');
+}
+function initExplore(){
+  $('searchPlace').innerHTML='<option value="">Selecciona un espacio</option>'+PLACES.map(p=>`<option value="${p.id}">${p.id}. ${esc(p.name)}</option>`).join('');
+  $('placeList').innerHTML=PLACES.map(p=>`<button class="placeBtn" id="pl${p.id}" onclick="selectLearnPlace(${p.id})">${p.id}. ${esc(p.name)}</button>`).join('');
+  $('learnInfo').innerHTML='<h4>Selecciona un espacio</h4><p>Aquí aparecerá la información del lugar escogido.</p>';
+  renderMap('mapExplore',{mode:'explore'});
+}
+function selectLearnPlace(id){
+  st.selectedLearn=id;
+  $('searchPlace').value=id;
+  document.querySelectorAll('.placeBtn').forEach(b=>b.classList.remove('active'));
+  const b=$('pl'+id); if(b) b.classList.add('active');
+  const p=place(id);
+  $('learnInfo').innerHTML=`<h4>${p.id}. ${esc(p.name)}</h4><p><strong>Categoría:</strong> ${esc(p.cat)}</p><p>${esc(p.desc)}</p><p><strong>Ubicación general:</strong> ${zone(p)}</p><p><strong>Coordenada aproximada:</strong> ${coordApprox(p)}</p>`;
+  renderMap('mapExplore',{mode:'explore',highlight:[id],labels:[id]});
+}
+function prepareLocate(){
+  const guided=$('difficulty').value==='guiado';
+  const base=guided?[1,3,11,16,18,22,31,33]:[1,4,8,12,14,18,22,24,27,31,33];
+  st.locatePool=shuffle(base).slice(0,6);
+  st.locateIndex=0; st.locateDone=false; st.locateHint=false; st.locateAttempts=0; st.score.locate=0;
+  $('locScore').textContent='0';
+  showLocateQuestion();
+  go('locate');
+}
+function showLocateQuestion(){
+  const id=st.locatePool[st.locateIndex], p=place(id);
+  $('locQuestion').innerHTML=`Ubica en el mapa: <strong>${esc(p.name)}</strong>`;
+  $('locProgress').textContent=`Pregunta ${st.locateIndex+1} de ${st.locatePool.length}`;
+  $('locHintBox').style.display='none';
+  $('locHintText').textContent='';
+  $('locFeedback').className='feedback';
+  $('nextLocateBtn').disabled=true;
+  st.locateDone=false; st.locateHint=false; st.locateAttempts=0;
+  renderMap('mapLocate',{mode:'locate'});
+}
+function useLocateHint(){
+  if(st.locateDone) return;
+  const p=place(st.locatePool[st.locateIndex]);
+  st.locateHint=true;
+  $('locHintBox').style.display='block';
+  $('locHintText').textContent=`Pista: ${zone(p)} Además, su coordenada aproximada es ${coordApprox(p)}.`;
+}
+function clickLocate(id){
+  if(st.locateDone) return;
+  const target=st.locatePool[st.locateIndex];
+  if(id===target){
+    let pts=5;
+    if(st.locateHint) pts=3;
+    if(st.locateAttempts>0) pts=Math.max(2,pts-1);
+    st.score.locate+=pts;
+    $('locScore').textContent=st.score.locate;
+    $('nextLocateBtn').disabled=false;
+    st.locateDone=true;
+    setFb('locFeedback','ok',`¡Correcto! Ubicaste <strong>${esc(place(id).name)}</strong>. Ganaste ${pts} puntos.`);
+    renderMap('mapLocate',{mode:'locate',highlight:[id],correct:id,labels:[id]});
+    $('scoreTop').textContent=total()+'/100';
+  }else{
+    st.locateAttempts++;
+    setFb('locFeedback','err','Ese punto no es correcto. Revisa la posición relativa del lugar y vuelve a intentar.');
+    renderMap('mapLocate',{mode:'locate',wrong:id});
+  }
+}
+function nextLocate(){
+  if(!st.locateDone) return;
+  if(st.locateIndex<st.locatePool.length-1){ st.locateIndex++; showLocateQuestion(); }
+  else{ buildThink(); go('think'); }
+}
+function buildThink(){
+  $('thinkWrap').innerHTML=THINK.map((q,i)=>`
+    <div class="question">
+      <strong>${i+1}. ${esc(q.q)}</strong>
+      <div class="options">
+        ${q.options.map(opt=>`<button class="option" onclick="pickThink(${i},'${String(opt).replace(/'/g,"\\'")}',this)">${esc(opt)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+  st.thinkAns={}; st.score.think=0; $('thinkScore').textContent='0'; $('thinkFeedback').className='feedback';
+}
+function pickThink(i,val,btn){
+  st.thinkAns[i]=val;
+  btn.parentElement.querySelectorAll('.option').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function validateThink(){
+  if(Object.keys(st.thinkAns).length<THINK.length){ setFb('thinkFeedback','warn','Responde todas las preguntas antes de continuar.'); return; }
+  let s=0;
+  THINK.forEach((q,i)=>{ if(st.thinkAns[i]===q.answer) s+=5; });
+  st.score.think=s; $('thinkScore').textContent=s; $('scoreTop').textContent=total()+'/100';
+  setFb('thinkFeedback', s>=20?'ok':'warn', `Obtuviste <strong>${s} puntos</strong> en esta etapa.`);
+  prepareEscape();
+  setTimeout(()=>go('escape'),650);
+}
+function prepareEscape(){
+  st.locks={l1:false,l2:false,l3:false,l4:false}; st.score.escape=0;
+  ['lock1','lock2','lock3','lock4'].forEach(id=>$(id).classList.remove('done'));
+  ['lock1Status','lock2Status','lock3Status','lock4Status'].forEach(id=>$(id).textContent='Esperando respuesta…');
+  document.querySelectorAll('#lock2Opts .option,#lock3Opts .option,#lock4Opts .option').forEach(b=>{b.disabled=false;b.classList.remove('good','bad');});
+  $('finalCode').value=''; $('escapeFeedback').className='feedback';
+  renderMap('mapEscape',{mode:'escape',showGrid:true});
+}
+function clickEscape(id){
+  if(st.locks.l1) return;
+  if(id===1){
+    st.locks.l1=true; st.score.escape+=4; $('scoreTop').textContent=total()+'/100';
+    $('lock1Status').innerHTML='✅ Correcto. Clave revelada: <strong>S</strong>';
+    $('lock1').classList.add('done');
+    renderMap('mapEscape',{mode:'escape',showGrid:true,highlight:[1],labels:[1]});
+  }else $('lock1Status').textContent='No es el punto de ingreso principal. Observa la parte sur del campus.';
+}
+function markGroup(groupId,btn,good){
+  document.querySelectorAll('#'+groupId+' .option').forEach(o=>o.disabled=true);
+  btn.classList.add(good?'good':'bad');
+}
+function solveLock2(btn,val){
+  if(st.locks.l2) return;
+  const good=val==='Cafetería'; markGroup('lock2Opts',btn,good);
+  if(good){ st.locks.l2=true; st.score.escape+=4; $('scoreTop').textContent=total()+'/100'; $('lock2Status').innerHTML='✅ Correcto. Clave revelada: <strong>18</strong>'; $('lock2').classList.add('done'); }
+  else $('lock2Status').textContent='Incorrecto. El servicio que está al este de la Biblioteca y ofrece alimentos ligeros es la Cafetería.';
+}
+function solveLock3(btn,val){
+  if(st.locks.l3) return;
+  const good=val==='F1'; markGroup('lock3Opts',btn,good);
+  if(good){ st.locks.l3=true; st.score.escape+=4; $('scoreTop').textContent=total()+'/100'; $('lock3Status').innerHTML='✅ Correcto. Clave revelada: <strong>F1</strong>'; $('lock3').classList.add('done'); }
+  else $('lock3Status').textContent='Incorrecto. La Cancha Grande aparece en la parte superior derecha del mapa.';
+}
+function solveLock4(btn,val){
+  if(st.locks.l4) return;
+  const good=val==='Cancha de baloncesto pequeña'; markGroup('lock4Opts',btn,good);
+  if(good){ st.locks.l4=true; st.score.escape+=4; $('scoreTop').textContent=total()+'/100'; $('lock4Status').innerHTML='✅ Correcto. Clave revelada: <strong>R</strong>'; $('lock4').classList.add('done'); }
+  else $('lock4Status').textContent='Incorrecto. La mejor referencia intermedia es la Cancha de baloncesto pequeña.';
+}
+function validateEscape(){
+  if(!st.locks.l1||!st.locks.l2||!st.locks.l3||!st.locks.l4){ setFb('escapeFeedback','warn','Debes resolver las cuatro cerraduras antes de introducir el código final.'); return; }
+  if($('finalCode').value.trim().toUpperCase()!=='S-18-F1-R'){ setFb('escapeFeedback','err','El código no es correcto. Revisa las claves reveladas.'); return; }
+  st.score.escape+=4; $('scoreTop').textContent=total()+'/100';
+  setFb('escapeFeedback','ok','¡Plano desbloqueado! Has superado el escape room cartográfico.');
+  buildCreate();
+  setTimeout(()=>go('create'),700);
+}
+
+function missionDestinations(){
+  return [22,16,18,3,31,11,28,20];
+}
+function changeDestination(val){
+  st.destination = parseInt(val) || 22;
+  const dest = place(st.destination);
+  if($('destPill')) $('destPill').textContent = 'Destino: ' + dest.name;
+  if(st.route.length >= 2){
+    if(st.route.length < 4) st.route = [1, st.destination];
+    else st.route[st.route.length-1] = st.destination;
+  } else {
+    st.route = [1, st.destination];
+  }
+  $('routeTags').innerHTML = st.route.map(id=>`<span>${place(id).id}. ${esc(place(id).name)}</span>`).join('');
+  renderMap('mapCreate',{mode:'explore',route:st.route,highlight:st.route,labels:st.route});
+}
+function buildCreate(){
+  st.destination = st.destination || 22;
+  st.route=[1,st.destination];
+  st.symbolMap={}; ESSENTIAL.forEach(id=>st.symbolMap[id]='');
+  const choices=PLACES.filter(p=>![1,st.destination].includes(p.id));
+  const opts='<option value="">Selecciona un punto</option>'+choices.map(p=>`<option value="${p.id}">${p.id}. ${esc(p.name)}</option>`).join('');
+  $('ref1').innerHTML=opts; $('ref2').innerHTML=opts; $('routeTags').innerHTML='';
+  const destOpts = missionDestinations().map(id=>`<option value="${id}" ${id===st.destination?'selected':''}>${id}. ${esc(place(id).name)}</option>`).join('');
+  $('destSelect').innerHTML = destOpts;
+  $('destPill').textContent = 'Destino: ' + place(st.destination).name;
+  $('symbolBuilder').innerHTML=ESSENTIAL.map(id=>{
+    const p=place(id);
+    return `<div class="symbolRow"><label>${p.id}. ${esc(p.name)}</label>
+      <select class="select" onchange="setSymbol(${id},this.value)">
+        <option value="">Símbolo</option>${SYMBOLS.map(s=>`<option value="${s}">${s}</option>`).join('')}
+      </select></div>`;
+  }).join('');
+  $('legendPreview').innerHTML=''; $('explanation').value=''; $('charCount').textContent='0'; st.score.create=0;
+  $('createFeedback').className='feedback';
+  renderMap('mapCreate',{mode:'explore',route:st.route,highlight:[1,st.destination],labels:[1,st.destination]});
+}
+function drawRoute(){
+  const a=parseInt($('ref1').value), b=parseInt($('ref2').value);
+  if(!a||!b){ setFb('createFeedback','warn','Selecciona dos puntos de referencia.'); return; }
+  if(a===b){ setFb('createFeedback','err','Los puntos de referencia deben ser distintos.'); return; }
+  st.route=[1,a,b,st.destination];
+  $('routeTags').innerHTML=st.route.map(id=>`<span>${place(id).id}. ${esc(place(id).name)}</span>`).join('');
+  renderMap('mapCreate',{mode:'explore',route:st.route,highlight:st.route,labels:st.route});
+  setFb('createFeedback','ok','Ruta dibujada. Ahora asigna símbolos y explica tu representación.');
+}
+function setSymbol(id,val){ st.symbolMap[id]=val; updateLegend(); }
+function updateLegend(){ $('legendPreview').innerHTML=ESSENTIAL.filter(id=>st.symbolMap[id]).map(id=>`<span><strong>${st.symbolMap[id]}</strong> ${esc(place(id).name)}</span>`).join(''); }
+$('explanation').addEventListener('input',()=> $('charCount').textContent=$('explanation').value.length);
+function validateCreate(){
+  if(st.route.length<4){ setFb('createFeedback','warn','Primero debes dibujar una ruta con dos puntos de referencia.'); return; }
+  const symbolCount=ESSENTIAL.filter(id=>st.symbolMap[id]).length;
+  const text=$('explanation').value.trim();
+  if(symbolCount<5){ setFb('createFeedback','warn','Asigna símbolos al menos a 5 espacios clave.'); return; }
+  if(text.length<80){ setFb('createFeedback','warn','Amplía la explicación para que refleje mejor la competencia trabajada.'); return; }
+  let s=0;
+  s+=8; s+=symbolCount===6?6:5; s+=new Set(ESSENTIAL.map(id=>st.symbolMap[id]).filter(Boolean)).size>=5?2:1; s+=text.length>=150?4:3;
+  st.score.create=Math.min(20,s); $('scoreTop').textContent=total()+'/100';
+  buildFinal(); go('final');
+}
+function buildFinal(){
+  $('evTitle').textContent=$('workTitle').value.trim() + ' · Destino: ' + place(st.destination).name;
+  $('evStudent').textContent=$('studentName').value.trim();
+  $('evCourse').textContent=$('studentCourse').value.trim();
+  $('evTeam').textContent=$('teamCode').value.trim()||'Trabajo individual';
+  $('evDate').textContent=new Date().toLocaleDateString('es-DO',{year:'numeric',month:'long',day:'numeric'});
+  $('evExplanation').textContent=$('explanation').value.trim();
+  $('finalLegend').innerHTML=ESSENTIAL.filter(id=>st.symbolMap[id]).map(id=>`<span><strong>${st.symbolMap[id]}</strong> ${esc(place(id).name)}</span>`).join('');
+  renderMap('mapFinal',{mode:'explore',route:st.route,highlight:st.route,labels:st.route});
+  const t=Math.min(100,total()+5); $('finalScore').textContent=t;
+  let level='Explorador cartográfico', badge='🧭';
+  if(t>=90){level='Maestro del plano perdido'; badge='🏆'}
+  else if(t>=75){level='Cartógrafo digital competente'; badge='🥇'}
+  else if(t>=60){level='Cartógrafo en desarrollo'; badge='📍'}
+  $('finalLevel').textContent=level; $('finalBadge').textContent=badge;
+  $('summaryList').innerHTML=[
+    ['Reto de ubicación', st.score.locate+'/30'],
+    ['Relaciones y orientación', st.score.think+'/25'],
+    ['Escape room cartográfico', st.score.escape+'/20'],
+    ['Representación final', st.score.create+'/20'],
+    ['Participación y exploración', '5/5']
+  ].map(r=>`<div class="resultItem"><span>${r[0]}</span><strong>${r[1]}</strong></div>`).join('');
+  $('criteriaBody').innerHTML=[
+    ['Reconoce y localiza espacios del IPISA', st.score.locate>=18?'Logrado':'En proceso'],
+    ['Usa relaciones espaciales y orientación', st.score.think>=15?'Logrado':'En proceso'],
+    ['Selecciona puntos de referencia útiles', st.route.length>=4?'Sí':'No'],
+    ['Representa una ruta lógica hacia ' + place(st.destination).name, st.route.length>=4?'Sí':'No'],
+    ['Asigna símbolos cartográficos', ESSENTIAL.filter(id=>st.symbolMap[id]).length+' espacios con símbolo'],
+    ['Explica cómo orientarse en el espacio', $('explanation').value.trim().length>=80?'Sí':'No']
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+  saveCurrentResult();
+}
+
+
+const TEACHER_USERNAME='docenteipisa';
+const TEACHER_PIN='739241';
+const TEACHER_SESSION_KEY='geoescape_ipisa_teacher_session';
+
+function isTeacherAuthorized(){
+  try{
+    return sessionStorage.getItem(TEACHER_SESSION_KEY)==='1';
+  }catch(e){
+    return false;
+  }
+}
+
+function requestTeacherAccess(){
+  if(isTeacherAuthorized()){
+    openRecords();
+    return;
+  }
+  const modal=$('teacherLoginModal');
+  if(!modal){
+    alert('No se encontró la ventana de acceso docente.');
+    return;
+  }
+  $('teacherUser').value='';
+  $('teacherPin').value='';
+  $('teacherLoginFeedback').className='feedback';
+  modal.classList.add('show');
+  setTimeout(()=>$('teacherUser').focus(),50);
+}
+
+function closeTeacherLogin(){
+  const modal=$('teacherLoginModal');
+  if(modal) modal.classList.remove('show');
+}
+
+function teacherLogin(){
